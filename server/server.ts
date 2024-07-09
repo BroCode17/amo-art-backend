@@ -5,12 +5,20 @@ import connectDB from "./config/connectDb";
 import mongoose from "mongoose";
 import userRoute from "./router/user.route";
 import error from "./middleware/error";
+import cookieParser from "cookie-parser";
+import cors from 'cors'
 //Database
+
+
+
+
 connectDB();
 
 const app = express();
 
+
 app.use(express.json({limit: '50mb'}))
+app.use(cookieParser())
 
 app.use('/api/v1/user', userRoute)
 

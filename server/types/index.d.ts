@@ -30,3 +30,15 @@ export interface ActivateUserInterface {
     activationCode: string;
 }
 
+export interface LoginInterface {
+    email: string;
+    password: string;
+}
+
+export interface CookieTokenOptions {
+    expires: Date;
+    maxAge: number;
+    httpOnly?: boolean;
+    sameSite?: "lax" | "strict" | "none" | undefined;
+    secure?: boolean;
+}
