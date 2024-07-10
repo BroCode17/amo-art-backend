@@ -1,12 +1,13 @@
 import  jwt, { JwtPayload } from 'jsonwebtoken';
-import { Request, Response, NextFunction } from "express";
+import e, { Request, Response, NextFunction } from "express";
 import CatchAsyncFunction from "../config/CatchAsyncError";
 import ErrorHandler from "../config/ErrorHandler";
 import userModel from "../model/user.model";
 import { TokenAndActivationCodeGenerator } from "../utils/tokenGenerator";
-import { ActivateUserInterface, LoginInterface, RegisterUserInterface } from "../types";
+import { ActivateUserInterface, LoginInterface, RegisterUserInterface, UpdateUserInfo } from "../types";
 import sendMail from "../utils/sendMail";
 import sendToken from '../utils/sendToken';
+import { getAllUsers } from '../service/user.services';
 
 export const registerUser = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -168,5 +169,96 @@ export const updateUserAccessToken = CatchAsyncFunction( async (req: Request, re
     }
     //if user exist
     //call send token method to generate new access/refresh tokne
+    
     sendToken(res, 201, isUserExist!)
+})
+
+//update user info
+
+export const getUserInfo = CatchAsyncFunction( async (req: Request, res: Response, next: NextFunction) => {
+     const userId = req.user?._id;
+
+     if(!userId){
+        //Unauthorized
+        return res.sendStatus(401)
+     }
+
+     const user = await userModel.findById(userId);
+     if(!user){
+       //If possible log the use out
+       return next(new ErrorHandler('User Not Found', 404));
+     }
+
+     res.status(200).json(user)
+})
+
+//update User info
+export const updateUserInfo = CatchAsyncFunction( async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.user?.id;
+
+  const{email}: UpdateUserInfo = req.body;
+
+
+  const isEmailExist = await userModel.findOne({email});
+  if(isEmailExist){
+    //Bad request
+    return next(new ErrorHandler('Email Already exist', 400));
+  }
+
+  //update user;
+  const user = await userModel.findById(userId);
+  if(!user){
+    return res.sendStatus(404)
+  }
+  user.email = email;
+
+  await user?.save();
+
+  //redis
+  res.status(201).json({
+    success: true,
+    user
+  })
+})
+
+
+//update user password
+export const updateUserPassword = CatchAsyncFunction( async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.user?.id;
+
+  const {oldPassword, password}: UpdateUserInfo = req.body;
+
+  const user = await userModel.findById(userId).select('+password');
+  if(!user){
+    return res.sendStatus(404)
+  }
+
+  if(!user.comparePasswrod(oldPassword)){
+    //Bad request
+    return next(new ErrorHandler('Old password do not match', 400));
+  }
+
+  //update user;
+  //hash the password
+  
+  user.password = password;
+
+  await user?.save();
+
+  //redis
+  res.status(201).json({
+    success: true,
+    user
+  })
+})
+
+
+// --------------Only for Admin-------------------
+export const allUsers = CatchAsyncFunction( async (req: Request, res: Response, next:NextFunction) => {
+  const users = await getAllUsers();
+
+  res.status(200).json({
+    success: true,
+    user: users,
+  })
 })

@@ -38,6 +38,15 @@ const authUser = CatchAsyncFunction( async (req: Request, res:Response, next: Ne
     next()
 })
 
+export const authUserRole = (...role: string[]) => {
+    return  (req: Request, res: Response, next:NextFunction) => {
+        if(!role.includes(req.user?.role!) || ''){
+            return next(new ErrorHandler('Permission deniel', 403))
+        }
+        next();
+    }
+}
+
 
 
 export default authUser

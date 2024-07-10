@@ -42,3 +42,9 @@ export interface CookieTokenOptions {
     sameSite?: "lax" | "strict" | "none" | undefined;
     secure?: boolean;
 }
+
+export interface UpdateUserInfo {
+   // name: string;
+    email: string;
+    password: string
+}
