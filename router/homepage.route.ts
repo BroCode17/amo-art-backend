@@ -4,7 +4,8 @@ import { addBannerImage, deleteBanner, updateCarouselBackImage } from "../contro
 
 const homeRoute = express.Router();
 
-homeRoute.route('/banner').get(getBanners).post( addBannerImage).delete(deleteBanner)
+homeRoute.route('/images').get(getBanners).post( addBannerImage).delete(deleteBanner)
+// homeRoute.post('/images', addBannerImage)
 homeRoute.put('/update-cal-back-image', updateCarouselBackImage)
 
 

@@ -8,16 +8,15 @@ import homepageModel from "../../model/homepage.model";
 //create and update banner
 export const addBannerImage = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { image } = req.body;
-    //console.log(req.body)
-    // return res.sendStatus(201)
-    if (!image) {
+    const { src, alt, tags } = req.body;
+
+    if (!src || !alt || tags) {
       return next(new ErrorHandler("Please, upload an image", 400));
     }
 
     //upload to cloudinary
     try {
-      const myCloud = await cloudinary.v2.uploader.upload(image, {
+      const myCloud = await cloudinary.v2.uploader.upload(src, {
         upload_preset: "dev_setup",
         //moderation: "duplicate:0.8",
       });

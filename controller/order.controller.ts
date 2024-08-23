@@ -72,7 +72,7 @@ export const addOrder = CatchAsyncFunction(
         }
         await session.commitTransaction();
         session.endSession();
-        console.log("Order created and products updated:", response);
+      
         res.status(201).json(response);
       } catch (error) {
         await session.abortTransaction();
@@ -88,7 +88,6 @@ export const addOrder = CatchAsyncFunction(
 export const getOrderWithProducts = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const orderId = req.params.id;
-    console.log(orderId);
     if (orderId.length === 0 || orderId.length < 8 || orderId.length > 8) {
       return next(new ErrorHandler("Enter a valid order reference id", 400));
     }
@@ -100,7 +99,7 @@ export const getOrderWithProducts = CatchAsyncFunction(
       })
       .exec();
 
-    console.log("Order with product details:", order);
+ 
     if (!order) {
       return next(new ErrorHandler("Order not found", 404));
     }
@@ -110,7 +109,7 @@ export const getOrderWithProducts = CatchAsyncFunction(
 export const delOrderById = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     const orderId = req.params.id;
-    console.log(orderId);
+
     if (orderId.length === 0 || orderId.length < 8 || orderId.length > 8) {
       return next(new ErrorHandler("Enter a valid order reference id", 400));
     }
@@ -118,7 +117,7 @@ export const delOrderById = CatchAsyncFunction(
       .deleteOne({ refrenceNumber: orderId })
       .exec();
 
-    console.log("Order with product details:", order);
+
     if (!order) {
       return next(new ErrorHandler("Order not found", 404));
     }

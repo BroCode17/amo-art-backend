@@ -11,6 +11,7 @@ import {v2 as cloudinary} from 'cloudinary'
 import homeRoute from "./router/homepage.route";
 import productRoute from "./router/product.route";
 import orderRouter from "./router/order.route";
+import imageRoute from "./router/image.route";
 const app = express();
 
 
@@ -55,14 +56,15 @@ cloudinary.config({
 // })
 // app.use(cors(corsOptions))
 app.use(cors({
-  origin: ['http://localhost:3000','https://art-r2dv2b1he-ebenezer-frimpongs-projects.vercel.app', 'https://art-eight-indol.vercel.app'], // Replace with your frontend URL
+  origin: ['http://localhost:3000','https://art-r2dv2b1he-ebenezer-frimpongs-projects.vercel.app', 'https://art-eight-indol.vercel.app', "https://amoarte.online/"], // Replace with your frontend URL
   credentials: true, // Allow cookies and credentials to be sent
 }));
 app.use(express.json({limit: '50mb'}))
 app.use(cookieParser())
 
 app.use('/api/v1/user', userRoute)
-app.use('/api/v1/layout', homeRoute)
+app.use('/api/v1/homepage', homeRoute)
+app.use('/api/v1/layout', imageRoute)
 app.use('/api/v1/products', productRoute)
 app.use('/api/v1/orders', orderRouter)
 
