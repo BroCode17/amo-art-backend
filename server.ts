@@ -56,7 +56,7 @@ cloudinary.config({
 // })
 // app.use(cors(corsOptions))
 app.use(cors({
-  origin: ['http://localhost:3000','https://art-r2dv2b1he-ebenezer-frimpongs-projects.vercel.app', 'https://art-eight-indol.vercel.app', "https://amoarte.online/"], // Replace with your frontend URL
+  origin: ['http://localhost:3000','https://art-r2dv2b1he-ebenezer-frimpongs-projects.vercel.app', 'https://art-eight-indol.vercel.app', "https://amoarte.online"], // Replace with your frontend URL
   credentials: true, // Allow cookies and credentials to be sent
 }));
 app.use(express.json({limit: '50mb'}))
