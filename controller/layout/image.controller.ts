@@ -5,6 +5,7 @@ import ErrorHandler from "../../config/ErrorHandler";
 import imageModel from "../../model/image.model";
 import { LayoutImage } from "../../types";
 import mongoose from "mongoose";
+import { getCloudinaryFolderName } from "../../utils/getUploadFolderName";
 
 export const addImage = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +27,7 @@ export const addImage = CatchAsyncFunction(
     try {
       // The DB document might be alread create show we have to update by create new banner
       const myCloud = await cloudinary.v2.uploader.upload(src, {
-        upload_preset: "dev_setup",
+        getUpload: getCloudinaryFolderName(),
         //moderation: "duplicate:0.8",
       });
 

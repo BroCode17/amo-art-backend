@@ -7,6 +7,7 @@ import productModel, {
 } from "../model/product.model";
 import ErrorHandler from "../config/ErrorHandler";
 import { LayoutImage } from "../types";
+import { getCloudinaryFolderName } from "../utils/getUploadFolderName";
 
 export const addProduct = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +19,7 @@ export const addProduct = CatchAsyncFunction(
 
       try {
         const myCloud = await cloudinary.v2.uploader.upload(image, {
-          upload_preset: "dev_setup",
+          upload_preset: getCloudinaryFolderName(),
           //moderation: "duplicate:0.8",
         });
 
@@ -218,7 +219,7 @@ export const updateProductById = CatchAsyncFunction(
           cloudinary.v2.uploader.destroy(image.public_src);
 
           const myCloud = await cloudinary.v2.uploader.upload(image, {
-            upload_preset: "dev_setup",
+            upload_preset: getCloudinaryFolderName(),
             //moderation: "duplicate:0.8",
           });
 
