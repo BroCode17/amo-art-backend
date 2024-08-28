@@ -23,7 +23,7 @@ export const getAllOrders = CatchAsyncFunction(
   }
 );
 
-export const addOrder = CatchAsyncFunction(
+export const createOrder = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       /**
@@ -41,6 +41,7 @@ export const addOrder = CatchAsyncFunction(
         customerShippingInformation,
         products,
         refrenceNumber,
+        itemSize
       } = req.body;
 
       const orderData = {
@@ -49,6 +50,7 @@ export const addOrder = CatchAsyncFunction(
         customerEmail,
         customerShippingInformation,
         products,
+        itemSize
       };
       const session = await mongoose.startSession();
       session.startTransaction();

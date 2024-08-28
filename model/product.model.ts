@@ -9,17 +9,34 @@ export interface ImageInterface {
 
 
 
+export interface Variant {
+    name:string;
+    price:number;
+}
+
 
 
 export interface ProductInterface {
     name: string;
     description: string;
     quantity: number;
-    price: number
+    variants: Array<{name: string, price: number}>,
     image: ImageInterface,
     isActive: boolean, 
     
 }
+
+const varaintSchema = new mongoose.Schema<Variant>({
+    name: {
+        type: String,
+        required:[true, 'Proudct name is required'],
+    },
+    price: {
+        type: Number,
+        required: [true, 'Product price is requrid']
+    }
+})
+
 
 
 export const productSchema = new mongoose.Schema<ProductInterface>({
@@ -35,14 +52,19 @@ export const productSchema = new mongoose.Schema<ProductInterface>({
         type: Number,
         required: [true,"Quantity must be at least 1"],
     },
-    price: {
-        type: Number,
-        required: [true,"Price is required. Product is not for free"],
-    },
+    variants: [{
+        name: {
+            type: String,
+            required:[true, 'Proudct name is required'],
+        },
+        price: {
+            type: Number,
+            required: [true, 'Product price is requrid']
+        }
+    }],
     image: {
         public_src: String,
         url: String,
-        base64: String,
     },
     isActive: {
         type: Boolean,

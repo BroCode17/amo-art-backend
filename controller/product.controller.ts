@@ -12,9 +12,11 @@ import { getCloudinaryFolderName } from "../utils/getUploadFolderName";
 export const addProduct = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, price, description, quantity, image } = req.body.data;
+      const { name, variants, description, quantity, image } = req.body.data;
 
-      if (!name || !price || !description || !quantity || !image)
+      // res.status(201).json({success: true})
+
+      if (!name || variants.length == 0 || !description || !quantity || !image)
         return next(new ErrorHandler("All field are required", 400));
 
       try {
@@ -26,22 +28,25 @@ export const addProduct = CatchAsyncFunction(
         const newImage = {
           public_src: myCloud.public_id,
           url: myCloud.secure_url,
-          base64: image,
         } as ImageInterface;
 
+        //New varient
+        const newVariant = variants.map(({id, ...rest}) => rest)
         //save to db
+
+       // res.status(201).json({success: true})
         const product = {
           name,
-          price,
+          variants: newVariant,
           description,
           quantity,
           image: newImage,
         };
-
+      
         const responds = await productModel.create(product);
 
         res.status(201).json({
-          secusss: true,
+          sucess: true,
           data: responds,
         });
       } catch (error: any) {
@@ -195,15 +200,16 @@ export const getProductById = CatchAsyncFunction(
 export const updateProductById = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, price, description, quantity, image } = req.body.data;
+      const { name, variants, description, quantity, image } = req.body;
       const itemId = req.params.id;
 
-      if (!name || !price || !description || !quantity || !itemId) {
-        return next(new ErrorHandler("All field are required", 400));
-      }
+    
+      // if (!name || !variants || !description || !quantity || !itemId) {
+      //   return next(new ErrorHandler("All field are required", 400));
+      // }
 
       //Update picture
-
+      // res.status(201).json({success: true})
       //Find the the item in db
       const product = await productModel.findById(itemId);
 
@@ -211,12 +217,13 @@ export const updateProductById = CatchAsyncFunction(
 
       //check of image
       let newImage;
+      
 
       if (image) {
         try {
           //delete the old image
 
-          cloudinary.v2.uploader.destroy(image.public_src);
+          cloudinary.v2.uploader.destroy(product.image.public_src);
 
           const myCloud = await cloudinary.v2.uploader.upload(image, {
             upload_preset: getCloudinaryFolderName(),
@@ -226,7 +233,6 @@ export const updateProductById = CatchAsyncFunction(
           newImage = {
             public_src: myCloud.public_id,
             url: myCloud.secure_url,
-            base64: image,
           } as ImageInterface;
 
           console.log(newImage);
@@ -235,16 +241,17 @@ export const updateProductById = CatchAsyncFunction(
           return next(error);
         }
       }
-      const newProduct = {
+      const newProduct: any = {
         name,
-        price,
+        variants,
         description,
         quantity,
       };
       if (newImage !== undefined) newProduct.image = newImage;
     
-      const result = await productModel.findByIdAndUpdate(itemId, {$set: newProduct}, {multi: true,});
+     await productModel.findByIdAndUpdate(itemId, {$set: newProduct}, {multi: true,});
 
+    
       return res.status(201).json({
         success: true,
       });

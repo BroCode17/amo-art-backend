@@ -26,6 +26,7 @@ interface CustomerAddressInterface {
 export interface OrderProductInterface {
     product: Types.ObjectId;
     orderedQuantity: number;
+    itemSize: string;
 }
 
 
@@ -48,7 +49,12 @@ const orderProductSchema = new Schema<OrderProductInterface>({
     orderedQuantity: {
         type: Number,
         required: true
+    },
+    itemSize: {
+        type: String,
+        default: "Original"
     }
+
 })
 
 const shippingSchema = new Schema<CustomerAddressInterface>({
