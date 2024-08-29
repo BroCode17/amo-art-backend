@@ -4,6 +4,8 @@ import orderModal from "../model/order.model";
 import mongoose from "mongoose";
 import productModel from "../model/product.model";
 import ErrorHandler from "../config/ErrorHandler";
+import sendMail from "../utils/sendMail";
+import { EmailOptions } from "../types";
 
 export const getAllOrders = CatchAsyncFunction(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -44,7 +46,7 @@ export const createOrder = CatchAsyncFunction(
         itemSize
       } = req.body;
 
-      const orderData = {
+      const orderData= {
         refrenceNumber,
         totalAmount,
         customerEmail,
@@ -59,7 +61,7 @@ export const createOrder = CatchAsyncFunction(
         const response = await orderModal.create([orderData], { session });
 
         for (const orderProduct of orderData.products) {
-          const product = await productModel
+          const product:any = await productModel
             .findById(orderProduct.product)
             .session(session);
 
@@ -74,11 +76,22 @@ export const createOrder = CatchAsyncFunction(
         }
         await session.commitTransaction();
         session.endSession();
-      
-        res.status(201).json(response);
+        
+        const order =  await customFindOrder(refrenceNumber)
+        //send Email to Customer
+       // if(!order) return next(new ErrorHandler(''))
+
+        const options: EmailOptions = {
+          email: order?.customerEmail,
+          subject: 'Order Confirmation',
+          template: 'confirm_order_mail.ejs',
+          data: order
+        }
+       
+        sendMail({options, next, res})
       } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
+        // await session.abortTransaction();
+        // session.endSession();
         console.error("Error creating order:", error);
       }
     } catch (error) {
@@ -93,13 +106,7 @@ export const getOrderWithProducts = CatchAsyncFunction(
     if (orderId.length === 0 || orderId.length < 8 || orderId.length > 8) {
       return next(new ErrorHandler("Enter a valid order reference id", 400));
     }
-    const order = await orderModal
-      .findOne({ refrenceNumber: orderId })
-      .populate({
-        path: "products.product",
-        select: "name description price image",
-      })
-      .exec();
+    const order = await customFindOrder(orderId)
 
  
     if (!order) {
@@ -138,7 +145,7 @@ export const updateTrackingId = CatchAsyncFunction(
       const order = await orderModal
         .findOneAndUpdate(
           { refrenceNumber: orderId },
-          { $set: { trackingId, orderStatus: shipState } }
+          { $set: { trackingId, orderStatus: shipState, } }
         )
         .exec();
 
@@ -152,3 +159,20 @@ export const updateTrackingId = CatchAsyncFunction(
     }
   }
 );
+
+
+const  customFindOrder = async(id: string) => {
+  const order = await orderModal
+      .findOne({ refrenceNumber: id })
+      .populate({
+        path: "products.product",
+        select: "name description price image variants",
+      }).exec();
+    /**
+     * .populate({
+        path: "products.product.variants",
+        select: 'name, price'
+      })
+     */
+  return order;
+}

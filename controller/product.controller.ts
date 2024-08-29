@@ -126,18 +126,18 @@ export const setActivateAndDeactive = CatchAsyncFunction(
     try {
       const { isActive } = req.body;
       const id = req.params.id;
-      console.log(isActive);
+  
 
       if (!id) {
         //Bad request
-        console.log("Hello");
+       
         return next(new ErrorHandler("All field are required", 400));
       }
       //find and update
       const p = await productModel.findByIdAndUpdate(id, {
         $set: { isActive: !isActive },
       });
-      console.log(p);
+    
 
       res.sendStatus(201);
     } catch (error) {
@@ -164,11 +164,12 @@ export const deleteProduct = CatchAsyncFunction(
         await cloudinary.v2.uploader.destroy(p?.image.public_src as string);
       } catch (error) {
         console.log(error);
+        return next(error)
       }
 
       res.sendStatus(200);
     } catch (error) {
-      return error;
+      return next(error);
     }
   }
 );
@@ -235,7 +236,6 @@ export const updateProductById = CatchAsyncFunction(
             url: myCloud.secure_url,
           } as ImageInterface;
 
-          console.log(newImage);
           //save to db
         } catch (error: any) {
           return next(error);
